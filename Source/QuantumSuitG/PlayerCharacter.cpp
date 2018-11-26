@@ -14,10 +14,7 @@ APlayerCharacter::APlayerCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	// Create static mesh component
-	//PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
-	//RootComponent = PlaneMesh;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	// Create a spring arm component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
@@ -43,22 +40,13 @@ APlayerCharacter::APlayerCharacter()
 
 void APlayerCharacter::Tick(float DeltaSeconds)
 {
+	// Call any parent class Tick implementation
+	Super::Tick(DeltaSeconds);
+
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
 
 	// Move plane forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
-
-	// Calculate change in rotation this frame
-	FRotator DeltaRotation(0, 0, 0);
-	DeltaRotation.Pitch = CurrentPitchSpeed * DeltaSeconds;
-	DeltaRotation.Yaw = CurrentYawSpeed * DeltaSeconds;
-	DeltaRotation.Roll = CurrentRollSpeed * DeltaSeconds;
-
-	// Rotate plane
-	AddActorLocalRotation(DeltaRotation);
-
-	// Call any parent class Tick implementation
-	Super::Tick(DeltaSeconds);
 }
 
 void APlayerCharacter::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimitiveComponent * OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult & Hit)
@@ -72,6 +60,7 @@ void APlayerCharacter::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, U
 
 void APlayerCharacter::BeginPlay()
 {
+	Super::BeginPlay();
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * InputComponent)
@@ -97,34 +86,19 @@ void APlayerCharacter::ThrustInput(float Val)
 	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 }
 
-void APlayerCharacter::MoveUpInput(float Val)
+void APlayerCharacter::MoveUpInput(float UpValue)
 {
-	// Target pitch speed is based in input
-	float TargetPitchSpeed = (Val * TurnSpeed * -1.f);
-
-	// When steering, we decrease pitch slightly
-	TargetPitchSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
-
-	// Smoothly interpolate to target pitch speed
-	CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetPitchSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+	if (UpValue != 0)
+	{
+		AddMovementInput(GetActorUpVector(), UpValue);
+	}
 }
 
-void APlayerCharacter::MoveRightInput(float Val)
+void APlayerCharacter::MoveRightInput(float RightValue)
 {
-	// Target yaw speed is based on input
-	float TargetYawSpeed = (Val * TurnSpeed);
-
-	// Smoothly interpolate to target yaw speed
-	CurrentYawSpeed = FMath::FInterpTo(CurrentYawSpeed, TargetYawSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
-
-	// Is there any left/right input?
-	const bool bIsTurning = FMath::Abs(Val) > 0.2f;
-
-	// If turning, yaw value is used to influence roll
-	// If not turning, roll to reverse current roll value.
-	float TargetRollSpeed = bIsTurning ? (CurrentYawSpeed * 0.5f) : (GetActorRotation().Roll * -2.f);
-
-	// Smoothly interpolate roll speed
-	CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+	if (RightValue != 0)
+	{
+		AddMovementInput(GetActorRightVector(), RightValue);
+	}
 }
 
