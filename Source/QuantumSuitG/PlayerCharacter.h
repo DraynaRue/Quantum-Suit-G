@@ -12,7 +12,8 @@ class QUANTUMSUITG_API APlayerCharacter : public ACharacter
 	GENERATED_BODY()
 
 	/** Spring arm that will offset the camera */
-	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))		class USpringArmComponent* SpringArm;
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))	
+	class USpringArmComponent* SpringArm;
 
 	/** Camera component that will be our viewpoint */
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -20,6 +21,14 @@ class QUANTUMSUITG_API APlayerCharacter : public ACharacter
 
 public:
 	APlayerCharacter();
+
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	float GameTimerStart;
+
+	UPROPERTY(Category = Gameplay, VisibleAnywhere, BlueprintReadOnly)
+	float GameTimerCurrent;
+
+	FTimerHandle TimerHandle_GameTimer;
 
 	// Begin AActor overrides
 	virtual void Tick(float DeltaSeconds) override;
@@ -42,6 +51,8 @@ protected:
 
 	/** Bound to the horizontal axis */
 	void MoveRightInput(float RightValue);
+
+	void GameTimerExpired();
 
 private:
 

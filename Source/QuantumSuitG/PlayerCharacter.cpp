@@ -44,9 +44,15 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
+	GameTimerCurrent = GetWorld()->GetTimerManager().GetTimerRemaining(TimerHandle_GameTimer);
 
 	// Move plane forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 0.5, FColor::Red, FString::Printf(TEXT("%f"), GameTimerCurrent));
+	}
 }
 
 void APlayerCharacter::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimitiveComponent * OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult & Hit)
@@ -61,6 +67,8 @@ void APlayerCharacter::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, U
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_GameTimer, this, &APlayerCharacter::GameTimerExpired, GameTimerStart);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * InputComponent)
@@ -100,5 +108,9 @@ void APlayerCharacter::MoveRightInput(float RightValue)
 	{
 		AddMovementInput(GetActorRightVector(), RightValue);
 	}
+}
+
+void APlayerCharacter::GameTimerExpired()
+{
 }
 
