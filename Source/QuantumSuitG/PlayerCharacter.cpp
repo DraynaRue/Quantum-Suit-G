@@ -59,6 +59,9 @@ void APlayerCharacter::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, U
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
+	float CurrentAcc = -10.0f * Acceleration;
+	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -96,7 +99,7 @@ void APlayerCharacter::MoveUpInput(float UpValue)
 {
 	if (UpValue != 0)
 	{
-		AddMovementInput(GetActorUpVector(), UpValue);
+		AddMovementInput(GetActorUpVector() * 2, UpValue);
 	}
 }
 
@@ -104,7 +107,7 @@ void APlayerCharacter::MoveRightInput(float RightValue)
 {
 	if (RightValue != 0)
 	{
-		AddMovementInput(GetActorRightVector(), RightValue);
+		AddMovementInput(GetActorRightVector() * 2, RightValue);
 	}
 }
 
