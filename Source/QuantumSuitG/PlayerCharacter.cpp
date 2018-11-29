@@ -59,9 +59,6 @@ void APlayerCharacter::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, U
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	// Deflect along the surface when we collide.
-	FRotator CurrentRotation = GetActorRotation();
-	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
 }
 
 void APlayerCharacter::BeginPlay()
@@ -69,6 +66,7 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_GameTimer, this, &APlayerCharacter::GameTimerExpired, GameTimerStart);
+	CurrentForwardSpeed = 1200;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * InputComponent)
