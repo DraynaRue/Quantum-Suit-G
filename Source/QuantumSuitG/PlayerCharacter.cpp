@@ -99,7 +99,7 @@ void APlayerCharacter::MoveUpInput(float UpValue)
 {
 	if (UpValue != 0)
 	{
-		AddMovementInput(GetActorUpVector() * 2, UpValue);
+		AddMovementInput(GetActorUpVector(), UpValue);
 	}
 }
 
@@ -107,7 +107,7 @@ void APlayerCharacter::MoveRightInput(float RightValue)
 {
 	if (RightValue != 0)
 	{
-		AddMovementInput(GetActorRightVector() * 2, RightValue);
+		AddMovementInput(GetActorRightVector(), RightValue);
 	}
 }
 
