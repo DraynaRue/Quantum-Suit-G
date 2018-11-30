@@ -8,6 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/World.h"
 #include "Engine/StaticMesh.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -130,5 +131,7 @@ void APlayerCharacter::MoveRightInput(float RightValue)
 
 void APlayerCharacter::GameTimerExpired()
 {
+	FName MapName = "FailMap";
+	UGameplayStatics::OpenLevel(GetWorld(), MapName);
 }
 
