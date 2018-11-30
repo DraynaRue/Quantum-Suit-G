@@ -22,6 +22,18 @@ class QUANTUMSUITG_API APlayerCharacter : public ACharacter
 public:
 	APlayerCharacter();
 
+	/** Max forward speed */
+	UPROPERTY(Category = Pitch, EditAnywhere, BlueprintReadWrite)
+		float MaxSpeed;
+
+	/** Min forward speed */
+	UPROPERTY(Category = Yaw, EditAnywhere, BlueprintReadWrite)
+		float MinSpeed;
+
+	/** Current forward speed */
+	UPROPERTY(Category = Plane, VisibleAnywhere, BlueprintReadOnly)
+		float CurrentForwardSpeed;
+
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float GameTimerStart;
 
@@ -63,17 +75,6 @@ private:
 	/** How quickly pawn can steer */
 	UPROPERTY(Category=Plane, EditAnywhere)
 	float TurnSpeed;
-
-	/** Max forward speed */
-	UPROPERTY(Category = Pitch, EditAnywhere)
-	float MaxSpeed;
-
-	/** Min forward speed */
-	UPROPERTY(Category=Yaw, EditAnywhere)
-	float MinSpeed;
-
-	/** Current forward speed */
-	float CurrentForwardSpeed;
 
 	/** Current yaw speed */
 	float CurrentYawSpeed;
