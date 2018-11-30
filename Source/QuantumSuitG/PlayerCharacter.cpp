@@ -49,19 +49,20 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	// Move plane forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
 
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.5, FColor::Red, FString::Printf(TEXT("%f"), GameTimerCurrent));
-	}
+	//if (GEngine)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 0.5, FColor::Red, FString::Printf(TEXT("%f"), GameTimerCurrent));
+	//}
 }
 
 void APlayerCharacter::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimitiveComponent * OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult & Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	float CurrentAcc = -10.0f * Acceleration;
-	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
-	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+	CurrentForwardSpeed = 0;
+	//float CurrentAcc = -50.0f * Acceleration;
+	//float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+	//CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -85,14 +86,30 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent * InputComponen
 
 void APlayerCharacter::ThrustInput(float Val)
 {
+	float CurrentAcc;
 	// Is there any input?
 	bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
-	// If input is not held down, reduce speed
-	float CurrentAcc = bHasInput ? (Val * Acceleration) : (-0.5f * Acceleration);
+	// If speed is below min, increase speed
+	if (CurrentForwardSpeed < MinSpeed)
+	{
+		CurrentAcc = 1.0f * Acceleration;
+	}
+	else
+	{
+		// If input is not held down, reduce speed
+		CurrentAcc = bHasInput ? (Val * Acceleration) : (-0.5f * Acceleration);
+	}
 	// Calculate new speed
 	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 	// Clamp between MinSpeed and MaxSpeed
-	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+	if (CurrentForwardSpeed < MinSpeed)
+	{
+		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, 0.0f, MaxSpeed);
+	}
+	else
+	{
+		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+	}
 }
 
 void APlayerCharacter::MoveUpInput(float UpValue)
